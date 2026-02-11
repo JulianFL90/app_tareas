@@ -1,4 +1,36 @@
-gradle-wrapper.jar
+# ----------------------------
+# Flutter / Dart
+# ----------------------------
+
+# Build
+/build/
+
+# Dart tool
+.dart_tool/
+
+# Generated files
+**/*.g.dart
+
+# Flutter plugins
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Pub
+.packages
+.pub-cache/
+.pub/
+
+# ----------------------------
+# IDE
+# ----------------------------
+
+.idea/
+*.iml
+
+# ----------------------------
+# Android
+# ----------------------------
+
 /.gradle
 /captures/
 /gradlew
@@ -7,8 +39,7 @@ gradle-wrapper.jar
 GeneratedPluginRegistrant.java
 .cxx/
 
-# Remember to never publicly share your keystore.
-# See https://flutter.dev/to/reference-keystore
+# Keystore (NO compartir nunca)
 key.properties
 **/*.keystore
 **/*.jks

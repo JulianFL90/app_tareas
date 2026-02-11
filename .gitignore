@@ -43,3 +43,15 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Drift generated files
+**/*.g.dart
+
+# Opcional si solo usarás Android
+linux/
+macos/
+web/
+windows/
+
+android/gradle/wrapper/gradle-wrapper.jar
+
