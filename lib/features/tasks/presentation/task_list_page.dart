@@ -7,7 +7,7 @@
 // - Aplica filtro + ordenación antes de renderizar.
 
 import 'package:flutter/material.dart';
-
+import 'task_create_page.dart';
 import '../data/task_repository.dart';
 import '../domain/machine.dart';
 import '../domain/task.dart';
@@ -55,12 +55,31 @@ class _TaskListPageState extends State<TaskListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Nueva tarea',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => TaskCreatePage(
+                machines: _machines.whereType<Machine>().toList(),
+              ),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
+
+
       appBar: AppBar(
         title: const Text('Tareas pendientes'),
         actions: [
           IconButton(
             tooltip: 'Filtrar y ordenar',
-            icon: const Icon(Icons.filter_alt_outlined),
+            icon: Icon(
+              _filter.hasAnyFilter ? Icons.filter_alt : Icons.filter_alt_outlined,
+            ),
+
             onPressed: () async {
               final result = await _openFilterSheet(
                 context: context,

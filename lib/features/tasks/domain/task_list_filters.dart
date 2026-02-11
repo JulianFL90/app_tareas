@@ -11,7 +11,6 @@
 // - NO accede a Flutter.
 // - Solo trabaja con modelos de dominio (Task, Machine, TaskPriority) y con TasksFilter.
 
-import 'machine.dart';
 import 'task.dart';
 import 'tasks_filter.dart';
 
@@ -26,8 +25,9 @@ List<Task> applyFilterAndSortTasks(List<Task> tasks, TasksFilter filter) {
   final filtered = tasks.where((task) {
     // --- Máquina ---
     if (filter.machine != null) {
-      // Machine no implementa == / hashCode, así que comparamos por identidad lógica.
-      if (!sameMachine(task.machine, filter.machine!)) return false;
+      // Machine ya implementa == y hashCode (igualdad lógica por type+number),
+      // así que podemos comparar directamente.
+      if (task.machine != filter.machine) return false;
     }
 
     // --- Prioridades ---
@@ -41,13 +41,6 @@ List<Task> applyFilterAndSortTasks(List<Task> tasks, TasksFilter filter) {
   // 2) Ordenación (mutamos `filtered` porque YA es copia)
   filtered.sort((a, b) => compareTasks(a, b, filter.sort));
   return filtered;
-}
-
-/// Compara dos máquinas por su identidad lógica: type + number.
-///
-/// Esto evita depender de igualdad por referencia (instancias distintas).
-bool sameMachine(Machine a, Machine b) {
-  return a.type == b.type && a.number == b.number;
 }
 
 /// Comparador central de ordenación según el enum TasksSort.

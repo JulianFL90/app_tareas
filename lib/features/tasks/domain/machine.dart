@@ -48,4 +48,54 @@ class Machine {
         return 'FSM-${number ?? '-'}';
     }
   }
+
+  // ------------------------------------------------------------
+  // Igualdad lógica
+  // ------------------------------------------------------------
+  //
+  // Dos Machine son iguales si representan la MISMA máquina real,
+  // no si son la misma instancia en memoria.
+  //
+  // Ejemplo:
+  // Machine(IRV, 3) == Machine(IRV, 3)  -> true
+  // Machine(IRV, 3) == Machine(IRV, 4)  -> false
+
+  @override
+  bool operator ==(Object other) {
+    // Si es la misma referencia en memoria, son iguales.
+    if (identical(this, other)) return true;
+
+    // Si no es una Machine, no puede ser igual.
+    if (other is! Machine) return false;
+
+    // Igualdad lógica: mismo tipo y mismo número.
+    return other.type == type && other.number == number;
+  }
+
+  // ------------------------------------------------------------
+  // hashCode
+  // ------------------------------------------------------------
+  //
+  // Regla FUNDAMENTAL:
+  // Si a == b  ->  a.hashCode == b.hashCode
+  //
+  // Usamos Object.hash para combinar los campos que definen
+  // la identidad lógica de la máquina.
+  //
+  // Esto es imprescindible para:
+  // - Set<Machine>
+  // - Map<Machine, ...>
+  // - contains(), remove(), filtros, etc.
+
+  @override
+  int get hashCode => Object.hash(type, number);
+
+  // ------------------------------------------------------------
+  // Debug (opcional pero muy útil)
+  // ------------------------------------------------------------
+  //
+  // Facilita leer logs y depurar sin depender de label.
+
+  @override
+  String toString() => 'Machine(type: $type, number: $number)';
 }

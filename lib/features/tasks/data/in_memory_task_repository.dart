@@ -12,6 +12,7 @@ import 'dart:math';
 
 import 'task_repository.dart';
 import '../domain/task.dart';
+import '../domain/shift.dart';
 
 class InMemoryTaskRepository implements TaskRepository {
   final List<Task> _tasks = [];
@@ -32,7 +33,7 @@ class InMemoryTaskRepository implements TaskRepository {
       machine: task.machine,
       priority: task.priority,
       description: task.description,
-      createdBy: task.createdBy,
+      shift: task.shift,
       createdAt: DateTime.now(),
       completedAt: null,
     );

@@ -8,6 +8,7 @@
 // - Aquí NO pintamos UI ni hablamos de Flutter: solo datos y reglas básicas.
 
 import 'machine.dart';
+import 'shift.dart';
 import 'task_priority.dart';
 
 /// Estado mínimo para el MVP: o está pendiente o está hecha.
@@ -29,8 +30,8 @@ class Task {
   /// Descripción humana: qué pasa / qué se detecta.
   final String description;
 
-  /// Quién reporta la tarea (texto libre o nº técnico, según decidáis).
-  final String createdBy;
+  /// Turno que reporta/crea la tarea.
+  final Shift shift;
 
   /// Momento de creación (para ordenar y auditar turnos).
   final DateTime createdAt;
@@ -43,7 +44,7 @@ class Task {
     required this.machine,
     required this.priority,
     required this.description,
-    required this.createdBy,
+    required this.shift,
     required this.createdAt,
     this.completedAt,
   });
@@ -59,7 +60,7 @@ class Task {
       machine: machine,
       priority: priority,
       description: description,
-      createdBy: createdBy,
+      shift: shift,
       createdAt: createdAt,
       completedAt: at ?? DateTime.now(),
     );
