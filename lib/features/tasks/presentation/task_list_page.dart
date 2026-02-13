@@ -57,20 +57,22 @@ class _TaskListPageState extends State<TaskListPage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         tooltip: 'Nueva tarea',
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (_) => TaskCreatePage(
                 machines: _machines.whereType<Machine>().toList(),
+                taskRepository: widget.taskRepository,
               ),
             ),
           );
+
+          // Fuerza rebuild => el FutureBuilder vuelve a pedir getAll()
+          setState(() {});
         },
         child: const Icon(Icons.add),
       ),
-
-
       appBar: AppBar(
         title: const Text('Tareas pendientes'),
         actions: [
@@ -79,7 +81,6 @@ class _TaskListPageState extends State<TaskListPage> {
             icon: Icon(
               _filter.hasAnyFilter ? Icons.filter_alt : Icons.filter_alt_outlined,
             ),
-
             onPressed: () async {
               final result = await _openFilterSheet(
                 context: context,

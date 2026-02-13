@@ -13,15 +13,20 @@ import 'package:flutter/material.dart';
 import '../domain/machine.dart';
 import '../domain/shift.dart';
 import '../domain/task_priority.dart';
+import '../data/task_repository.dart';
+import '../domain/task.dart';
+
 
 class TaskCreatePage extends StatefulWidget {
   /// Catálogo de máquinas disponible (hoy hardcode, mañana BBDD).
   /// Para crear tarea NO queremos null.
   final List<Machine> machines;
+  final TaskRepository taskRepository;
 
   const TaskCreatePage({
     super.key,
     required this.machines,
+    required this.taskRepository,
   });
 
   @override
@@ -59,12 +64,27 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
 
   /// Acción: (MVP) todavía no guardamos.
   /// En el siguiente paso, aquí construiremos el Task (con shift) y lo guardaremos.
-  void _onSave() {
+  Future<void> _onSave() async {
     if (!_isValid) return;
 
-    // TODO: siguiente paso -> construir Task y guardarlo
+    final now = DateTime.now();
+
+    final task = Task(
+      id: now.microsecondsSinceEpoch.toString(),
+      machine: _selectedMachine!,
+      priority: _selectedPriority,
+      description: _descriptionController.text.trim(),
+      shift: _selectedShift,
+      createdAt: now,
+      completedAt: null,
+    );
+
+    await widget.taskRepository.create(task);
+
+    if (!mounted) return;
     Navigator.pop(context);
   }
+
 
   @override
   Widget build(BuildContext context) {

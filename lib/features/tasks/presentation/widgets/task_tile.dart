@@ -78,13 +78,14 @@ class TaskTile extends StatelessWidget {
   Color _priorityColor(TaskPriority priority) {
     switch (priority) {
       case TaskPriority.low:
-        return Colors.amber; // 🟡
+        return Colors.amber.shade300; // más claro, menos saturado
       case TaskPriority.medium:
-        return Colors.orange; // 🟠
+        return Colors.orange.shade600; // más profundo
       case TaskPriority.high:
-        return Colors.red; // 🔴
+        return Colors.red.shade600; // rojo menos chillón
     }
   }
+
 }
 
 class _Chip extends StatelessWidget {
