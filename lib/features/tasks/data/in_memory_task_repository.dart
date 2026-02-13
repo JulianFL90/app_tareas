@@ -54,6 +54,11 @@ class InMemoryTaskRepository implements TaskRepository {
     return updated;
   }
 
+  @override
+  Future<void> delete(String taskId) async {
+    _tasks.removeWhere((t) => t.id == taskId);
+  }
+
   String _newId() {
     // Id legible y suficientemente único para un repo en memoria.
     final millis = DateTime.now().millisecondsSinceEpoch;

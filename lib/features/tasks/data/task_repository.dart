@@ -18,4 +18,8 @@ abstract class TaskRepository {
 
   /// Marca una tarea como hecha y devuelve la tarea actualizada.
   Future<Task> markDone(String taskId);
+
+  /// Elimina una tarea definitivamente.
+  Future<void> delete(String taskId);
+
 }

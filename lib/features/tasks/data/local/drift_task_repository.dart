@@ -67,6 +67,11 @@ class DriftTaskRepository implements TaskRepository {
     return _mapRowToDomain(row);
   }
 
+  @override
+  Future<void> delete(String taskId) async {
+    await (db.delete(db.tasksTable)..where((t) => t.id.equals(taskId))).go();
+  }
+
   // -----------------------------
   // Mappers (SQLite <-> Dominio)
   // -----------------------------

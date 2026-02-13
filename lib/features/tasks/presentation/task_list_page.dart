@@ -15,6 +15,8 @@ import '../domain/task_list_filters.dart';
 import '../domain/tasks_filter.dart';
 import 'tasks_filter_sheet.dart';
 import 'widgets/task_tile.dart';
+import 'task_detail_page.dart';
+
 
 class TaskListPage extends StatefulWidget {
   final TaskRepository taskRepository;
@@ -118,7 +120,24 @@ class _TaskListPageState extends State<TaskListPage> {
             itemCount: visibleTasks.length,
             itemBuilder: (context, index) {
               final task = visibleTasks[index];
-              return TaskTile(task: task);
+              return TaskTile(
+                task: task,
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TaskDetailPage(
+                        task: task,
+                        taskRepository: widget.taskRepository,
+                      ),
+                    ),
+                  );
+
+                  setState(() {});
+                },
+
+              );
+
             },
           );
         },
