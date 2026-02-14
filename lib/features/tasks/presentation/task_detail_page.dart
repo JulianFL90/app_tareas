@@ -8,7 +8,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../data/task_repository.dart';
+import '../domain/task_repository.dart';
 import '../domain/task.dart';
 import '../domain/task_priority.dart';
 

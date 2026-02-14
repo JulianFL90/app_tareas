@@ -9,8 +9,7 @@
 //   - Persistencia (TasksTable en SQLite)
 
 import 'package:drift/drift.dart';
-
-import '../task_repository.dart';
+import '../../domain/task_repository.dart';
 import '../../domain/machine.dart';
 import '../../domain/shift.dart';
 import '../../domain/task.dart';

@@ -8,7 +8,7 @@
 
 import 'package:flutter/material.dart';
 import 'task_create_page.dart';
-import '../data/task_repository.dart';
+import '../domain/task_repository.dart';
 import '../domain/machine.dart';
 import '../domain/task.dart';
 import '../domain/task_list_filters.dart';

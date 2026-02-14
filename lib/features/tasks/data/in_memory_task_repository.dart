@@ -9,8 +9,7 @@
 //   gracias al contrato TaskRepository.
 
 import 'dart:math';
-
-import 'task_repository.dart';
+import '../domain/task_repository.dart';
 import '../domain/task.dart';
 import '../domain/shift.dart';
 
