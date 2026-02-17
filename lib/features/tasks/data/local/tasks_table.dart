@@ -5,6 +5,7 @@
 // Nota:
 // - Guardamos enums como TEXT (string) para que sea legible y fácil de migrar.
 // - Guardamos fechas como INTEGER (millisecondsSinceEpoch).
+// - Ahora la tarea referencia una máquina mediante machineId.
 
 import 'package:drift/drift.dart';
 
@@ -15,11 +16,10 @@ class TasksTable extends Table {
   TextColumn get id => text()();
 
   // -----------------------------
-  // Máquina (la guardamos como dos campos)
+  // Relación con máquina
   // -----------------------------
-  // Ej: type="irv" y number=3  => IRV-3
-  TextColumn get machineType => text()();
-  IntColumn get machineNumber => integer().nullable()();
+  // Referencia a machines.id
+  TextColumn get machineId => text()();
 
   // -----------------------------
   // Datos de la tarea

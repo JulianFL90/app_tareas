@@ -5,8 +5,13 @@
 // - Guarda el estado del filtro actual.
 // - Abre el BottomSheet para editar filtro/ordenación.
 // - Aplica filtro + ordenación antes de renderizar.
+//
+// Nota (temporal):
+// - El catálogo de máquinas sigue hardcodeado, pero YA usa el nuevo modelo:
+//   Machine(id, label). Más adelante vendrá de BBDD.
 
 import 'package:flutter/material.dart';
+
 import 'task_create_page.dart';
 import '../domain/task_repository.dart';
 import '../domain/machine.dart';
@@ -16,7 +21,6 @@ import '../domain/tasks_filter.dart';
 import 'tasks_filter_sheet.dart';
 import 'widgets/task_tile.dart';
 import 'task_detail_page.dart';
-
 
 class TaskListPage extends StatefulWidget {
   final TaskRepository taskRepository;
@@ -35,23 +39,24 @@ class _TaskListPageState extends State<TaskListPage> {
   /// Vive en la page (no en el sheet) para que persista entre aperturas.
   TasksFilter _filter = TasksFilter.initial;
 
-  /// Catálogo de máquinas del centro (MVP hardcode).
+  /// Catálogo de máquinas del centro (temporal hardcode).
   ///
-  /// Más adelante vendrá de BBDD/repositorio, pero esta pantalla
-  /// es quien debe proveer ese dato a la UI (sheet).
+  /// En el nuevo modelo, Machine tiene:
+  /// - id (para guardar en BBDD)
+  /// - label (para mostrar en UI)
   final List<Machine?> _machines = const [
     null, // "Todas"
-    Machine(type: MachineType.top),
-    Machine(type: MachineType.cfc),
-    Machine(type: MachineType.irv, number: 1),
-    Machine(type: MachineType.irv, number: 2),
-    Machine(type: MachineType.irv, number: 3),
-    Machine(type: MachineType.irv, number: 4),
-    Machine(type: MachineType.fsm, number: 1),
-    Machine(type: MachineType.fsm, number: 2),
-    Machine(type: MachineType.fsm, number: 3),
-    Machine(type: MachineType.fsm, number: 4),
-    Machine(type: MachineType.fsm, number: 5),
+    Machine(id: 'top', label: 'TOP'),
+    Machine(id: 'cfc', label: 'CFC'),
+    Machine(id: 'irv1', label: 'IRV1'),
+    Machine(id: 'irv2', label: 'IRV2'),
+    Machine(id: 'irv3', label: 'IRV3'),
+    Machine(id: 'irv4', label: 'IRV4'),
+    Machine(id: 'fsm1', label: 'FSM1'),
+    Machine(id: 'fsm2', label: 'FSM2'),
+    Machine(id: 'fsm3', label: 'FSM3'),
+    Machine(id: 'fsm4', label: 'FSM4'),
+    Machine(id: 'fsm5', label: 'FSM5'),
   ];
 
   @override
@@ -135,9 +140,7 @@ class _TaskListPageState extends State<TaskListPage> {
 
                   setState(() {});
                 },
-
               );
-
             },
           );
         },

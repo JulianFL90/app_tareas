@@ -9,6 +9,7 @@
 //   - Persistencia (TasksTable en SQLite)
 
 import 'package:drift/drift.dart';
+
 import '../../domain/task_repository.dart';
 import '../../domain/machine.dart';
 import '../../domain/shift.dart';
@@ -29,15 +30,10 @@ class DriftTaskRepository implements TaskRepository {
 
   @override
   Future<Task> create(Task task) async {
-    // Insertamos usando los datos del dominio.
-    // Ojo: aquí asumimos que quien llama ya trae id y createdAt listos.
-    // Si quieres que el repo genere id/fecha (como el in-memory),
-    // lo haremos en el siguiente paso.
     await db.into(db.tasksTable).insert(
       TasksTableCompanion.insert(
         id: task.id,
-        machineType: task.machine.type.name,
-        machineNumber: Value(task.machine.number),
+        machineId: task.machine.id,
         priority: task.priority.name,
         shift: task.shift.name,
         description: task.description,
@@ -60,7 +56,8 @@ class DriftTaskRepository implements TaskRepository {
       ),
     );
 
-    final row = await (db.select(db.tasksTable)..where((t) => t.id.equals(taskId)))
+    final row =
+    await (db.select(db.tasksTable)..where((t) => t.id.equals(taskId)))
         .getSingle();
 
     return _mapRowToDomain(row);
@@ -79,8 +76,10 @@ class DriftTaskRepository implements TaskRepository {
     return Task(
       id: row.id,
       machine: Machine(
-        type: MachineType.values.byName(row.machineType),
-        number: row.machineNumber,
+        id: row.machineId,
+        // Temporal: aún no tenemos tabla machines, así que derivamos un label legible.
+        // Cuando creemos MachinesTable, aquí haremos JOIN y vendrá de la BBDD.
+        label: _prettyMachineLabel(row.machineId),
       ),
       priority: TaskPriority.values.byName(row.priority),
       shift: Shift.values.byName(row.shift),
@@ -90,5 +89,19 @@ class DriftTaskRepository implements TaskRepository {
           ? null
           : DateTime.fromMillisecondsSinceEpoch(row.completedAt!),
     );
+  }
+
+  String _prettyMachineLabel(String machineId) {
+    // Ajuste rápido para que no se vea "irv1" en UI mientras no exista MachinesTable.
+    // Ejemplos:
+    // - top -> TOP
+    // - cfc -> CFC
+    // - irv1 -> IRV1
+    // - fsm3 -> FSM3
+    if (machineId.isEmpty) return machineId;
+
+    final upper = machineId.toUpperCase();
+    // Por si algún día usas ids tipo "irv-1" o "IRV-1"
+    return upper.replaceAll('-', '');
   }
 }

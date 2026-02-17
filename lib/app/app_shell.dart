@@ -11,7 +11,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../features/tasks/data/task_repository.dart';
+import '../features/tasks/domain/task_repository.dart';
 import '../features/tasks/presentation/task_list_page.dart';
 
 class AppShell extends StatelessWidget {
