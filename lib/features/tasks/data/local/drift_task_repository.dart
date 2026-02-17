@@ -1,12 +1,13 @@
 // lib/features/tasks/data/local/drift_task_repository.dart
 //
-// Implementación del repositorio usando Drift (SQLite local).
+// 📦 Implementación del repositorio de tareas usando Drift (SQLite local).
 //
-// Importante:
+// Responsabilidad:
 // - Cumple el contrato TaskRepository.
-// - Traduce entre:
-//   - Dominio (Task, Machine, Shift, TaskPriority)
-//   - Persistencia (TasksTable en SQLite)
+// - Traduce entre dominio (Task, Machine, Shift, TaskPriority)
+//   y persistencia (TasksTable en SQLite).
+// - Resuelve el label de la máquina consultando MachinesTable
+//   en lugar de usar el id como fallback.
 
 import 'package:drift/drift.dart';
 
@@ -25,7 +26,8 @@ class DriftTaskRepository implements TaskRepository {
   @override
   Future<List<Task>> getAll() async {
     final rows = await db.select(db.tasksTable).get();
-    return rows.map(_mapRowToDomain).toList();
+    // Usamos Future.wait porque _mapRowToDomain es async (consulta MachinesTable).
+    return Future.wait(rows.map(_mapRowToDomain));
   }
 
   @override
@@ -72,15 +74,28 @@ class DriftTaskRepository implements TaskRepository {
   // Mappers (SQLite <-> Dominio)
   // -----------------------------
 
-  Task _mapRowToDomain(TasksTableData row) {
+  /// Convierte una fila de TasksTable a dominio.
+  /// Consulta MachinesTable para obtener el label real de la máquina.
+  Future<Task> _mapRowToDomain(TasksTableData row) async {
+    final machineRow = await db.getMachineById(row.machineId);
+
+    // Si la máquina existe en bbdd usamos su label real.
+    // Si no (dato huérfano), usamos el id en mayúsculas como fallback seguro.
+    final machine = machineRow != null
+        ? Machine(
+      id: machineRow.id,
+      centerId: machineRow.centerId,
+      label: machineRow.label,
+    )
+        : Machine(
+      id: row.machineId,
+      centerId: '',
+      label: row.machineId.toUpperCase(),
+    );
+
     return Task(
       id: row.id,
-      machine: Machine(
-        id: row.machineId,
-        centerId: '',
-        label: _prettyMachineLabel(row.machineId),
-      ),
-
+      machine: machine,
       priority: TaskPriority.values.byName(row.priority),
       shift: Shift.values.byName(row.shift),
       description: row.description,
@@ -89,19 +104,5 @@ class DriftTaskRepository implements TaskRepository {
           ? null
           : DateTime.fromMillisecondsSinceEpoch(row.completedAt!),
     );
-  }
-
-  String _prettyMachineLabel(String machineId) {
-    // Ajuste rápido para que no se vea "irv1" en UI mientras no exista MachinesTable.
-    // Ejemplos:
-    // - top -> TOP
-    // - cfc -> CFC
-    // - irv1 -> IRV1
-    // - fsm3 -> FSM3
-    if (machineId.isEmpty) return machineId;
-
-    final upper = machineId.toUpperCase();
-    // Por si algún día usas ids tipo "irv-1" o "IRV-1"
-    return upper.replaceAll('-', '');
   }
 }

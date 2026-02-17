@@ -6,6 +6,7 @@
 // - Cargar las máquinas del centro activo desde MachineRepository.
 // - Cargar tareas desde TaskRepository.
 // - Mantener el filtro activo mientras la pantalla vive.
+// - Mostrar el nombre del centro activo en el AppBar.
 // - Permitir crear nuevas tareas y ver su detalle.
 // - Abrir un bottom sheet para filtrar/ordenar.
 
@@ -26,14 +27,18 @@ class TaskListPage extends StatefulWidget {
   final TaskRepository taskRepository;
   final MachineRepository machineRepository;
 
-  /// Id del centro activo. Determina qué máquinas se muestran.
+  /// Id del centro activo. Determina qué máquinas se cargan.
   final String centerId;
+
+  /// Nombre del centro activo. Se muestra en el AppBar.
+  final String centerName;
 
   const TaskListPage({
     super.key,
     required this.taskRepository,
     required this.machineRepository,
     required this.centerId,
+    required this.centerName,
   });
 
   @override
@@ -63,7 +68,6 @@ class _TaskListPageState extends State<TaskListPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Esperamos a que carguen las máquinas antes de pintar la pantalla.
     return FutureBuilder<List<Machine?>>(
       future: _machinesFuture,
       builder: (context, machinesSnapshot) {
@@ -89,25 +93,23 @@ class _TaskListPageState extends State<TaskListPage> {
                 context,
                 MaterialPageRoute(
                   builder: (_) => TaskCreatePage(
-                    // Filtramos el null: TaskCreatePage solo necesita máquinas reales.
                     machines: machines.whereType<Machine>().toList(),
                     taskRepository: widget.taskRepository,
                   ),
                 ),
               );
 
-              // Recargamos máquinas y tareas al volver.
               setState(() => _loadMachines());
             },
             child: const Icon(Icons.add),
           ),
 
           appBar: AppBar(
-            title: const Text('Tareas pendientes'),
+            // Mostramos el nombre del centro activo como título.
+            title: Text(widget.centerName),
             actions: [
               IconButton(
                 tooltip: 'Filtrar y ordenar',
-                // Icono relleno si hay filtros activos.
                 icon: Icon(
                   _filter.hasAnyFilter
                       ? Icons.filter_alt
@@ -144,7 +146,6 @@ class _TaskListPageState extends State<TaskListPage> {
                 return const Center(child: Text('No hay tareas pendientes'));
               }
 
-              // Aplicamos filtro y orden antes de pintar.
               final visibleTasks = applyFilterAndSortTasks(tasks, _filter);
 
               return ListView.builder(

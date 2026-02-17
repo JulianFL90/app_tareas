@@ -2,16 +2,18 @@
 //
 // 🚪 Puerta de entrada de la app.
 //
-// Responsabilidad:
-// - Comprobar si ya existe un centro creado.
-// - Si no hay centro: mostrar el wizard de creación (CreateCenterPage).
-// - Si ya hay centro: entrar en la app (AppShell).
+// Decide qué mostrar según el estado inicial:
+// - Sin centros → wizard de creación (CreateCenterPage).
+// - Con centros → selector de centro (CenterPickerPage).
 //
-// Es el único punto que decide qué "rama" de la app se muestra al arrancar.
+// Una vez el usuario selecciona un centro, entra en AppShell
+// con el centerId activo.
 
 import 'package:flutter/material.dart';
 
+import '../features/centers/domain/center.dart' as domain;
 import '../features/centers/domain/center_repository.dart';
+import '../features/centers/presentation/center_picker_page.dart';
 import '../features/centers/presentation/create_center_page.dart';
 import '../features/machines/domain/machine_repository.dart';
 import '../features/tasks/domain/task_repository.dart';
@@ -34,7 +36,11 @@ class AppGate extends StatefulWidget {
 }
 
 class _AppGateState extends State<AppGate> {
-  late Future<List<dynamic>> _centersFuture;
+  late Future<List<domain.Center>> _centersFuture;
+
+  /// Centro seleccionado por el usuario en CenterPickerPage.
+  /// Null mientras no haya seleccionado ninguno.
+  domain.Center? _activeCenter;
 
   @override
   void initState() {
@@ -43,14 +49,24 @@ class _AppGateState extends State<AppGate> {
   }
 
   /// Recarga la lista de centros desde el repositorio.
-  /// Se llama al arrancar y cuando el wizard finaliza.
   void _reloadCenters() {
     _centersFuture = widget.centerRepository.getAll();
+    _activeCenter = null;
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    // Si ya hay un centro seleccionado, entramos directamente en AppShell.
+    if (_activeCenter != null) {
+      return AppShell(
+        taskRepository: widget.taskRepository,
+        machineRepository: widget.machineRepository,
+        activeCenterId: _activeCenter!.id,
+        activeCenterName: _activeCenter!.name,
+      );
+    }
+
+    return FutureBuilder<List<domain.Center>>(
       future: _centersFuture,
       builder: (context, snapshot) {
         // Cargando
@@ -67,27 +83,27 @@ class _AppGateState extends State<AppGate> {
           );
         }
 
-        final centers = (snapshot.data ?? const []) as List;
-        final hasCenter = centers.isNotEmpty;
+        final centers = snapshot.data ?? [];
 
-        // Sin centro: mostramos el wizard de creación.
-        if (!hasCenter) {
+        // Sin centros: mostramos el wizard de creación.
+        if (centers.isEmpty) {
           return CreateCenterPage(
             centerRepository: widget.centerRepository,
             machineRepository: widget.machineRepository,
-            onFinished: () {
-              setState(() {
-                _reloadCenters();
-              });
-            },
+            onFinished: () => setState(() => _reloadCenters()),
           );
         }
 
-        // Con centro: entramos en la app.
-        return AppShell(
-          taskRepository: widget.taskRepository,
+        // Con centros: mostramos el selector.
+        return CenterPickerPage(
+          centers: centers,
+          centerRepository: widget.centerRepository,
           machineRepository: widget.machineRepository,
-          activeCenterId: (centers.first).id as String,
+          isPremium: false, // TODO: conectar con sistema de suscripción
+          onCenterSelected: (center) {
+            setState(() => _activeCenter = center);
+          },
+          onCenterCreated: () => setState(() => _reloadCenters()),
         );
       },
     );

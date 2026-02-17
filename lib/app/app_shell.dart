@@ -3,10 +3,10 @@
 // 🐚 Contenedor principal de la app una vez superado el AppGate.
 //
 // Responsabilidad:
-// - Servir de punto estable donde colgar navegación global (tabs, drawer, etc.)
-// - Recibir dependencias de alto nivel y pasarlas a las pantallas que las necesiten.
+// - Recibir el centro activo y las dependencias necesarias.
+// - Pasárselas a TaskListPage.
 //
-// Cuando añadamos más secciones (centros, perfil, ajustes...),
+// Cuando añadamos más secciones (ajustes, perfil...),
 // este widget será el lugar natural para un BottomNavigationBar.
 
 import 'package:flutter/material.dart';
@@ -19,14 +19,18 @@ class AppShell extends StatelessWidget {
   final TaskRepository taskRepository;
   final MachineRepository machineRepository;
 
-  /// Id del centro activo. Determina qué máquinas se cargan en la lista.
+  /// Id del centro activo. Determina qué máquinas y tareas se cargan.
   final String activeCenterId;
+
+  /// Nombre del centro activo. Se muestra en el AppBar de TaskListPage.
+  final String activeCenterName;
 
   const AppShell({
     super.key,
     required this.taskRepository,
     required this.machineRepository,
     required this.activeCenterId,
+    required this.activeCenterName,
   });
 
   @override
@@ -35,6 +39,7 @@ class AppShell extends StatelessWidget {
       taskRepository: taskRepository,
       machineRepository: machineRepository,
       centerId: activeCenterId,
+      centerName: activeCenterName,
     );
   }
 }

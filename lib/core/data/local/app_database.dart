@@ -13,4 +13,20 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 4;
+
+  /// Devuelve todas las máquinas de un centro, ordenadas por fecha de creación.
+  Future<List<MachinesTableData>> getMachinesByCenter(String centerId) {
+    return (select(machinesTable)
+      ..where((m) => m.centerId.equals(centerId))
+      ..orderBy([(m) => OrderingTerm.asc(m.createdAt)]))
+        .get();
+  }
+
+  /// Devuelve una máquina por su id. Null si no existe.
+  Future<MachinesTableData?> getMachineById(String machineId) {
+    return (select(machinesTable)..where((m) => m.id.equals(machineId)))
+        .getSingleOrNull();
+  }
 }
+
+
