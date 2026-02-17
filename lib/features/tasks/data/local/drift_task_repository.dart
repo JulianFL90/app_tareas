@@ -77,8 +77,6 @@ class DriftTaskRepository implements TaskRepository {
       id: row.id,
       machine: Machine(
         id: row.machineId,
-        // Temporal: aún no tenemos tabla machines, así que derivamos un label legible.
-        // Cuando creemos MachinesTable, aquí haremos JOIN y vendrá de la BBDD.
         label: _prettyMachineLabel(row.machineId),
       ),
       priority: TaskPriority.values.byName(row.priority),

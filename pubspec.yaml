@@ -20,8 +20,6 @@ dependencies:
     sdk: flutter
   uuid: ^4.4.0
 
-
-
   # Iconos estilo iOS (opcional pero habitual)
   cupertino_icons: ^1.0.8
 
