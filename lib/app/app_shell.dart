@@ -1,13 +1,14 @@
 // lib/app/app_shell.dart
 //
-// Contenedor principal de la app.
+// Contenedor principal ("shell") de la app una vez superado el AppGate.
 //
-// Por qué existe este archivo:
-// - Actúa como “cascarón” de la aplicación.
-// - Recibe dependencias (repositorios).
-// - Decide qué pantalla se muestra como entrada.
+// Responsabilidad:
+// - Servir de punto estable donde colgar navegación global (tabs, drawer, etc.)
+// - Recibir dependencias de alto nivel (repositorios/servicios) y pasarlas
+//   a las pantallas que lo necesiten.
 //
-// En el MVP solo muestra la lista de tareas pendientes.
+// En este MVP:
+// - Solo mostramos la lista de tareas.
 
 import 'package:flutter/material.dart';
 
@@ -24,8 +25,11 @@ class AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TaskListPage(
-      taskRepository: taskRepository,
-    );
+    // Para el MVP, AppShell no añade UI extra (Scaffold/tabs).
+    // Simplemente delega en la pantalla principal.
+    //
+    // Cuando añadamos más secciones (centros, máquinas, perfil, etc.),
+    // este widget será el lugar natural para un BottomNavigationBar.
+    return TaskListPage(taskRepository: taskRepository);
   }
 }
