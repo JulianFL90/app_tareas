@@ -1,35 +1,40 @@
 // lib/app/app_shell.dart
 //
-// Contenedor principal ("shell") de la app una vez superado el AppGate.
+// 🐚 Contenedor principal de la app una vez superado el AppGate.
 //
 // Responsabilidad:
 // - Servir de punto estable donde colgar navegación global (tabs, drawer, etc.)
-// - Recibir dependencias de alto nivel (repositorios/servicios) y pasarlas
-//   a las pantallas que lo necesiten.
+// - Recibir dependencias de alto nivel y pasarlas a las pantallas que las necesiten.
 //
-// En este MVP:
-// - Solo mostramos la lista de tareas.
+// Cuando añadamos más secciones (centros, perfil, ajustes...),
+// este widget será el lugar natural para un BottomNavigationBar.
 
 import 'package:flutter/material.dart';
 
+import '../features/machines/domain/machine_repository.dart';
 import '../features/tasks/domain/task_repository.dart';
 import '../features/tasks/presentation/task_list_page.dart';
 
 class AppShell extends StatelessWidget {
   final TaskRepository taskRepository;
+  final MachineRepository machineRepository;
+
+  /// Id del centro activo. Determina qué máquinas se cargan en la lista.
+  final String activeCenterId;
 
   const AppShell({
     super.key,
     required this.taskRepository,
+    required this.machineRepository,
+    required this.activeCenterId,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Para el MVP, AppShell no añade UI extra (Scaffold/tabs).
-    // Simplemente delega en la pantalla principal.
-    //
-    // Cuando añadamos más secciones (centros, máquinas, perfil, etc.),
-    // este widget será el lugar natural para un BottomNavigationBar.
-    return TaskListPage(taskRepository: taskRepository);
+    return TaskListPage(
+      taskRepository: taskRepository,
+      machineRepository: machineRepository,
+      centerId: activeCenterId,
+    );
   }
 }

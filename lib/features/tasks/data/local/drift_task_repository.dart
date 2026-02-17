@@ -15,7 +15,7 @@ import '../../../machines/domain/machine.dart';
 import '../../domain/shift.dart';
 import '../../domain/task.dart';
 import '../../domain/task_priority.dart';
-import 'app_database.dart';
+import '../../../../core/data/local/app_database.dart';
 
 class DriftTaskRepository implements TaskRepository {
   final AppDatabase db;
@@ -77,8 +77,10 @@ class DriftTaskRepository implements TaskRepository {
       id: row.id,
       machine: Machine(
         id: row.machineId,
+        centerId: '',
         label: _prettyMachineLabel(row.machineId),
       ),
+
       priority: TaskPriority.values.byName(row.priority),
       shift: Shift.values.byName(row.shift),
       description: row.description,

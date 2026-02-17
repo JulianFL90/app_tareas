@@ -3,7 +3,7 @@
 // Implementación del repositorio de centros usando Drift.
 
 import 'package:drift/drift.dart';
-import '../../../tasks/data/local/app_database.dart';
+import '../../../../core/data/local/app_database.dart';
 import '../../domain/center.dart';
 import '../../domain/center_repository.dart';
 

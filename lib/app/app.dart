@@ -1,26 +1,25 @@
 // lib/app/app.dart
 //
-// Punto de entrada UI de la aplicación.
+// 🚀 Punto de entrada UI de la aplicación.
 //
-// Responsabilidad de este archivo:
-// - Construir el MaterialApp (tema, rutas, home).
-// - Hacer el "wiring" mínimo para arrancar la app.
+// Responsabilidad:
+// - Construir el MaterialApp (tema, home).
+// - Hacer el "wiring" de dependencias: bbdd y repositorios.
 //
 // Nota de arquitectura:
-// Aquí estamos creando dependencias (DB y repositorios) directamente.
-// Para un MVP es aceptable, pero en un proyecto más grande esto se suele
-// mover a un "composition root" (p.ej. lib/app/di/ o lib/core/di/) para
-// que App no dependa de implementaciones concretas (Drift, SQLite, etc.).
+// Aquí creamos las dependencias directamente (composition root simple).
+// Para un proyecto más grande esto se movería a lib/core/di/ o similar,
+// para que App no dependa de implementaciones concretas (Drift, SQLite...).
 
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_theme.dart';
 
-// Infraestructura (persistencia). Ojo: estos imports acoplan App a "local".
-// Más adelante lo moveremos a una capa de inyección / configuración.
-import '../features/tasks/data/local/app_database.dart';
+// Infraestructura (persistencia).
+import '../core/data/local/app_database.dart';
 import '../features/tasks/data/local/drift_task_repository.dart';
 import '../features/centers/data/local/drift_center_repository.dart';
+import '../features/machines/data/local/drift_machine_repository.dart';
 
 import 'app_gate.dart';
 
@@ -30,25 +29,25 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Base de datos única para toda la app.
-    // Importante: si creáramos varias instancias, podríamos tener
-    // conexiones duplicadas y estados incoherentes.
+    // Una sola instancia evita conexiones duplicadas y estados incoherentes.
     final database = AppDatabase();
 
-    // Repositorios concretos (implementación).
-    // La UI no debería conocer "Drift" idealmente; debería depender
-    // de interfaces del dominio. Lo abordaremos en el refactor de DI.
+    // Repositorios concretos.
+    // Todos comparten la misma instancia de AppDatabase.
     final taskRepository = DriftTaskRepository(db: database);
     final centerRepository = DriftCenterRepository(db: database);
+    final machineRepository = DriftMachineRepository(db: database);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
 
-      // "home" arranca en AppGate, que decide qué pantalla mostrar
-      // según el estado inicial de la app (p.ej. si ya existe un centro).
+      // AppGate decide qué pantalla mostrar según el estado inicial
+      // (si ya existe un centro o no).
       home: AppGate(
         centerRepository: centerRepository,
         taskRepository: taskRepository,
+        machineRepository: machineRepository,
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:uuid/uuid.dart';
 
-import '../domain/machine.dart';
-import '../domain/machine_repository.dart';
+import '../../domain/machine.dart';
+import '../../domain/machine_repository.dart';
 
 /// Implementación en memoria.
 /// Útil para desarrollo inicial antes de conectar Drift.

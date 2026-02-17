@@ -1,23 +1,21 @@
+// lib/features/machines/domain/machine_repository.dart
+//
+// Contrato del repositorio de máquinas.
+// La capa de presentación depende de esta abstracción,
+// nunca de la implementación concreta (Drift, memoria, API...).
+
 import 'machine.dart';
 
-/// Contrato para gestionar máquinas/lugares de trabajo.
-/// La UI depende de este contrato, no de la implementación (Drift, memoria, API, etc.).
-abstract class MachineRepository {
+abstract interface class MachineRepository {
   /// Devuelve todas las máquinas de un centro concreto.
   Future<List<Machine>> getByCenter(String centerId);
 
-  /// Crea una máquina individual.
+  /// Crea una máquina y la persiste.
   Future<Machine> create({
     required String centerId,
     required String label,
   });
 
-  /// Crea varias máquinas de golpe (útil para el wizard inicial).
-  Future<void> bulkCreate({
-    required String centerId,
-    required List<String> labels,
-  });
-
-  /// Elimina una máquina por id.
+  /// Elimina una máquina por su id.
   Future<void> delete(String machineId);
 }

@@ -1,39 +1,67 @@
+// lib/features/centers/presentation/center_setup_machines_page.dart
+//
+// 🏭 Paso 2/2 del wizard de creación de centro.
+//
+// Responsabilidad:
+// - Mostrar el formulario para añadir máquinas/lugares.
+// - Delegar toda la lógica en CenterSetupMachinesController.
+// - Al finalizar u omitir, persistir centro y máquinas en Drift.
+// - Volver a CreateCenterPage con resultado `true`.
+//
+// ⚠️ El centro se guarda AQUÍ (no en el paso 1) para evitar
+// centros huérfanos si el usuario cierra la app entre pasos.
+
 import 'package:flutter/material.dart';
 
-import '../domain/center.dart' as domain;
+import '../domain/center_repository.dart';
+import '../../../features/machines/domain/machine_repository.dart';
 import 'controllers/center_setup_machines_controller.dart';
 import 'widgets/wizard_step_header_card.dart';
 
-/// Paso 2/2 del wizard: añadir máquinas/lugares a un centro.
 class CenterSetupMachinesPage extends StatefulWidget {
-  final domain.Center center;
+  /// Nombre del centro introducido en el Paso 1 (aún no persistido).
+  final String centerName;
+
+  /// Repositorio de centros: para crear el centro en Drift al finalizar.
+  final CenterRepository centerRepository;
+
+  /// Repositorio de máquinas: para crear las máquinas en Drift al finalizar.
+  final MachineRepository machineRepository;
 
   const CenterSetupMachinesPage({
     super.key,
-    required this.center,
+    required this.centerName,
+    required this.centerRepository,
+    required this.machineRepository,
   });
 
   @override
-  State<CenterSetupMachinesPage> createState() => _CenterSetupMachinesPageState();
+  State<CenterSetupMachinesPage> createState() =>
+      _CenterSetupMachinesPageState();
 }
 
 class _CenterSetupMachinesPageState extends State<CenterSetupMachinesPage> {
-  final _controller = TextEditingController();
+  final _textController = TextEditingController();
   late final CenterSetupMachinesController _vm;
 
   @override
   void initState() {
     super.initState();
-    _vm = CenterSetupMachinesController();
+    _vm = CenterSetupMachinesController(
+      centerRepository: widget.centerRepository,
+      machineRepository: widget.machineRepository,
+      centerName: widget.centerName,
+    );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _textController.dispose();
     _vm.dispose();
     super.dispose();
   }
 
+  /// Finaliza el wizard: persiste centro y máquinas (o solo centro si skip).
   Future<void> _finish({required bool skip}) async {
     await _vm.finish(skip: skip);
     if (!mounted) return;
@@ -71,23 +99,20 @@ class _CenterSetupMachinesPageState extends State<CenterSetupMachinesPage> {
                               stepLabel: 'Paso 2/2',
                               title: 'Añade máquinas / lugares',
                               subtitle:
-                              'Centro: ${widget.center.name}\nEjemplos: “Taller”, “Muelle 7”, “Cuadro eléctrico”, "Máquina".',
+                              'Centro: ${widget.centerName}\nEjemplos: "Taller", "Muelle 7", "Cuadro eléctrico", "Máquina".',
                             ),
                             const SizedBox(height: 12),
-
                             _AddMachineCard(
-                              controller: _controller,
+                              controller: _textController,
                               saving: saving,
                               errorText: errorText,
                               onChanged: (v) => _vm.validate(v),
                               onAdd: () {
-                                final added = _vm.tryAdd(_controller.text);
-                                if (added) _controller.clear();
+                                final added = _vm.tryAdd(_textController.text);
+                                if (added) _textController.clear();
                               },
                             ),
-
                             const SizedBox(height: 12),
-
                             _MachinesListCard(
                               items: items,
                               onRemoveAt: _vm.removeAt,
@@ -98,7 +123,6 @@ class _CenterSetupMachinesPageState extends State<CenterSetupMachinesPage> {
                     ),
                   ),
                 ),
-
                 _BottomBar(
                   saving: saving,
                   onSkip: () => _finish(skip: true),
@@ -113,6 +137,11 @@ class _CenterSetupMachinesPageState extends State<CenterSetupMachinesPage> {
   }
 }
 
+// ─────────────────────────────────────────────
+// Widgets privados de esta pantalla
+// ─────────────────────────────────────────────
+
+/// 📝 Tarjeta con el campo de texto para añadir una nueva máquina.
 class _AddMachineCard extends StatelessWidget {
   final TextEditingController controller;
   final bool saving;
@@ -131,7 +160,6 @@ class _AddMachineCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     final value = controller.text.trim();
     final canAdd = !saving && value.length >= 2;
 
@@ -187,6 +215,7 @@ class _AddMachineCard extends StatelessWidget {
   }
 }
 
+/// 📋 Tarjeta con la lista de máquinas añadidas (con opción de eliminar).
 class _MachinesListCard extends StatelessWidget {
   final List<String> items;
   final void Function(int index) onRemoveAt;
@@ -276,6 +305,7 @@ class _MachinesListCard extends StatelessWidget {
   }
 }
 
+/// ⬇️ Barra inferior con los botones de "Finalizar" y "Saltar".
 class _BottomBar extends StatelessWidget {
   final bool saving;
   final VoidCallback onSkip;

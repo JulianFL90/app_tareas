@@ -21,7 +21,7 @@ class CreateCenterFormCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final ok = errorText == null && controller.text.trim().length >= 3;
+    final ok = errorText == null && currentLength >= 3;
 
     return Card(
       elevation: 0,
