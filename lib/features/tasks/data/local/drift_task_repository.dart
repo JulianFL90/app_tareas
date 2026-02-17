@@ -11,7 +11,7 @@
 import 'package:drift/drift.dart';
 
 import '../../domain/task_repository.dart';
-import '../../domain/machine.dart';
+import '../../../machines/domain/machine.dart';
 import '../../domain/shift.dart';
 import '../../domain/task.dart';
 import '../../domain/task_priority.dart';

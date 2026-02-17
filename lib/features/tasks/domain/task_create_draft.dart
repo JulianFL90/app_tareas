@@ -3,7 +3,7 @@
 // Modelo simple con los datos mínimos que el usuario introduce al crear una tarea.
 // No es una Task todavía (no tiene id, ni createdAt, etc.).
 
-import 'machine.dart';
+import '../../machines/domain/machine.dart';
 import 'task_priority.dart';
 
 class TaskCreateDraft {

@@ -7,7 +7,7 @@
 // - Es la “fuente de verdad” de lo que la app entiende por tarea.
 // - Aquí NO pintamos UI ni hablamos de Flutter: solo datos y reglas básicas.
 
-import 'machine.dart';
+import '../../machines/domain/machine.dart';
 import 'shift.dart';
 import 'task_priority.dart';
 

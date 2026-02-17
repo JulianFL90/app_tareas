@@ -7,7 +7,7 @@
 // - Separa la lógica de filtrado/ordenación de la UI.
 // - Permite aplicar filtros sin “ensuciar” la page.
 
-import 'machine.dart';
+import '../../machines/domain/machine.dart';
 import 'task_priority.dart';
 
 /// Opciones de ordenación disponibles en la lista.

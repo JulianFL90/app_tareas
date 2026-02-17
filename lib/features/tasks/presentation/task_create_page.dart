@@ -10,7 +10,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../domain/machine.dart';
+import '../../machines/domain/machine.dart';
 import '../domain/shift.dart';
 import '../domain/task_priority.dart';
 import '../domain/task_repository.dart';

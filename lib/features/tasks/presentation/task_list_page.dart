@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 
 import 'task_create_page.dart';
 import '../domain/task_repository.dart';
-import '../domain/machine.dart';
+import '../../machines/domain/machine.dart';
 import '../domain/task.dart';
 import '../domain/task_list_filters.dart';
 import '../domain/tasks_filter.dart';
