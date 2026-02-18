@@ -112,7 +112,7 @@ class _CreateCenterPageState extends State<CreateCenterPage> {
                               stepLabel: 'Paso 1/2',
                               title: 'Crea tu centro',
                               subtitle:
-                              'Un centro es tu "espacio de trabajo". Dentro añadirás máquinas y tareas.',
+                              'Un centro es tu "espacio de trabajo". Dentro añadirás máquinas, lugares de trabajo y tareas.',
                             ),
                             const SizedBox(height: 12),
                             CreateCenterFormCard(

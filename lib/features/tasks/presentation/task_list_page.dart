@@ -7,6 +7,7 @@
 // - Cargar tareas desde TaskRepository.
 // - Mantener el filtro activo mientras la pantalla vive.
 // - Mostrar el nombre del centro activo en el AppBar.
+// - Permitir volver al selector de centros.
 // - Permitir crear nuevas tareas y ver su detalle.
 // - Abrir un bottom sheet para filtrar/ordenar.
 
@@ -33,12 +34,16 @@ class TaskListPage extends StatefulWidget {
   /// Nombre del centro activo. Se muestra en el AppBar.
   final String centerName;
 
+  /// Callback para volver al selector de centros.
+  final VoidCallback onBackToSelector;
+
   const TaskListPage({
     super.key,
     required this.taskRepository,
     required this.machineRepository,
     required this.centerId,
     required this.centerName,
+    required this.onBackToSelector,
   });
 
   @override
@@ -105,9 +110,18 @@ class _TaskListPageState extends State<TaskListPage> {
           ),
 
           appBar: AppBar(
+            // Botón para volver al selector de centros.
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              tooltip: 'Cambiar de centro',
+              onPressed: widget.onBackToSelector,
+            ),
+
             // Mostramos el nombre del centro activo como título.
             title: Text(widget.centerName),
+
             actions: [
+              // Botón de filtros.
               IconButton(
                 tooltip: 'Filtrar y ordenar',
                 icon: Icon(
@@ -143,12 +157,37 @@ class _TaskListPageState extends State<TaskListPage> {
               final tasks = snapshot.data ?? [];
 
               if (tasks.isEmpty) {
-                return const Center(child: Text('No hay tareas pendientes'));
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.task_alt_rounded,
+                        size: 80,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.3),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No hay tareas pendientes',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               }
 
               final visibleTasks = applyFilterAndSortTasks(tasks, _filter);
 
               return ListView.builder(
+                padding: const EdgeInsets.only(top: 8, bottom: 80),
                 itemCount: visibleTasks.length,
                 itemBuilder: (context, index) {
                   final task = visibleTasks[index];
