@@ -26,7 +26,7 @@ class TaskTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final borderColor = _priorityColor(task.priority);
+    final borderColor = task.priority.color(context);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -99,18 +99,6 @@ class TaskTile extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  /// Color del borde según la prioridad.
-  Color _priorityColor(TaskPriority priority) {
-    switch (priority) {
-      case TaskPriority.low:
-        return Colors.green.shade600;
-      case TaskPriority.medium:
-        return Colors.orange.shade600;
-      case TaskPriority.high:
-        return Colors.red.shade600;
-    }
   }
 
   /// Icono según la prioridad.

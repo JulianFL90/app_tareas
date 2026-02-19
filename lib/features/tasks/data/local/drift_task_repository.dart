@@ -58,8 +58,7 @@ class DriftTaskRepository implements TaskRepository {
       ),
     );
 
-    final row =
-    await (db.select(db.tasksTable)..where((t) => t.id.equals(taskId)))
+    final row = await (db.select(db.tasksTable)..where((t) => t.id.equals(taskId)))
         .getSingle();
 
     return _mapRowToDomain(row);
@@ -68,6 +67,12 @@ class DriftTaskRepository implements TaskRepository {
   @override
   Future<void> delete(String taskId) async {
     await (db.delete(db.tasksTable)..where((t) => t.id.equals(taskId))).go();
+  }
+
+  @override
+  Future<void> deleteByMachine(String machineId) async {
+    await (db.delete(db.tasksTable)..where((t) => t.machineId.equals(machineId)))
+        .go();
   }
 
   // -----------------------------

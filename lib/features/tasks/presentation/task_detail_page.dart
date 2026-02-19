@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 
 import '../domain/task_repository.dart';
 import '../domain/task.dart';
-import '../domain/task_priority.dart';
 
 class TaskDetailPage extends StatelessWidget {
   final Task task;
@@ -24,7 +23,8 @@ class TaskDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final priorityColor = _priorityColor(task.priority);
+    // ✅ Fuente de verdad única
+    final priorityColor = task.priority.color(context);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Detalle')),
@@ -60,16 +60,23 @@ class TaskDetailPage extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    _Chip(icon: Icons.precision_manufacturing, text: task.machine.label),
-                    _Chip(icon: Icons.flag, text: task.priority.label),
-                    _Chip(icon: Icons.schedule, text: task.shift.label),
+                    _Chip(
+                      icon: Icons.precision_manufacturing,
+                      text: task.machine.label,
+                    ),
+                    _Chip(
+                      icon: Icons.flag,
+                      text: task.priority.label,
+                    ),
+                    _Chip(
+                      icon: Icons.schedule,
+                      text: task.shift.label,
+                    ),
                   ],
                 ),
               ],
             ),
           ),
-
-          const SizedBox(height: 16),
 
           const SizedBox(height: 16),
 
@@ -87,6 +94,7 @@ class TaskDetailPage extends StatelessWidget {
             ],
           ),
 
+          const SizedBox(height: 16),
 
           // -----------------------------
           // Acción principal
@@ -126,17 +134,6 @@ class TaskDetailPage extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Color _priorityColor(TaskPriority priority) {
-    switch (priority) {
-      case TaskPriority.low:
-        return Colors.amber.shade300;
-      case TaskPriority.medium:
-        return Colors.orange.shade600;
-      case TaskPriority.high:
-        return Colors.red.shade600;
-    }
   }
 
   String _formatDate(DateTime dt) {

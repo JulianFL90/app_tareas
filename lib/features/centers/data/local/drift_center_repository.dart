@@ -3,6 +3,7 @@
 // Implementación del repositorio de centros usando Drift.
 
 import 'package:drift/drift.dart';
+
 import '../../../../core/data/local/app_database.dart';
 import '../../domain/center.dart';
 import '../../domain/center_repository.dart';
@@ -20,8 +21,7 @@ class DriftCenterRepository implements CenterRepository {
       return Center(
         id: row.id,
         name: row.name,
-        createdAt:
-        DateTime.fromMillisecondsSinceEpoch(row.createdAt),
+        createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
       );
     }).toList();
   }
@@ -45,5 +45,10 @@ class DriftCenterRepository implements CenterRepository {
       name: name,
       createdAt: now,
     );
+  }
+
+  @override
+  Future<void> delete(String centerId) async {
+    await (db.delete(db.centersTable)..where((c) => c.id.equals(centerId))).go();
   }
 }

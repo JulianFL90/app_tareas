@@ -16,7 +16,6 @@ import '../domain/task_priority.dart';
 import '../domain/task_repository.dart';
 import '../domain/task.dart';
 
-
 class TaskCreatePage extends StatefulWidget {
   /// Catálogo de máquinas disponible (hoy hardcode, mañana BBDD).
   /// Para crear tarea NO queremos null.
@@ -62,8 +61,6 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
   /// Acción: cerrar sin crear.
   void _onCancel() => Navigator.pop(context);
 
-  /// Acción: (MVP) todavía no guardamos.
-  /// En el siguiente paso, aquí construiremos el Task (con shift) y lo guardaremos.
   Future<void> _onSave() async {
     if (!_isValid) return;
 
@@ -85,9 +82,13 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
     Navigator.pop(context);
   }
 
-
   @override
   Widget build(BuildContext context) {
+    // ✅ Máquinas en orden alfabético (ignorando mayúsculas)
+    final sortedMachines = widget.machines.toList()
+      ..sort((a, b) =>
+          a.label.toLowerCase().compareTo(b.label.toLowerCase()));
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Nueva tarea'),
@@ -117,7 +118,7 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
                 border: OutlineInputBorder(),
                 hintText: 'Selecciona una máquina',
               ),
-              items: widget.machines.map((m) {
+              items: sortedMachines.map((m) {
                 return DropdownMenuItem(
                   value: m,
                   child: Text(m.label),

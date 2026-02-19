@@ -1,4 +1,4 @@
-// lib/features/tasks/data/task_repository.dart
+// lib/features/tasks/domain/task_repository.dart
 //
 // Contrato (interfaz) para acceder y modificar tareas.
 //
@@ -22,4 +22,6 @@ abstract class TaskRepository {
   /// Elimina una tarea definitivamente.
   Future<void> delete(String taskId);
 
+  /// ✅ Elimina todas las tareas asociadas a una máquina.
+  Future<void> deleteByMachine(String machineId);
 }

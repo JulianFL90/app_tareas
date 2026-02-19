@@ -1,27 +1,22 @@
 // lib/features/machines/presentation/machines_manager_page.dart
-//
-// 🔧 Pantalla de gestión de máquinas/lugares.
-//
-// Responsabilidad:
-// - Mostrar la lista de máquinas del centro activo.
-// - Permitir añadir, editar y eliminar máquinas.
-//
-// Esta pantalla se abre desde TaskListPage cuando el usuario
-// quiere gestionar los lugares de trabajo del centro.
 
 import 'package:flutter/material.dart';
 
+import '../../tasks/domain/task_repository.dart';
+import '../application/delete_machine_and_tasks.dart';
 import '../domain/machine.dart';
 import '../domain/machine_repository.dart';
 
 class MachinesManagerPage extends StatefulWidget {
   final MachineRepository machineRepository;
+  final TaskRepository taskRepository;
   final String centerId;
   final String centerName;
 
   const MachinesManagerPage({
     super.key,
     required this.machineRepository,
+    required this.taskRepository,
     required this.centerId,
     required this.centerName,
   });
@@ -43,7 +38,11 @@ class _MachinesManagerPageState extends State<MachinesManagerPage> {
     _machinesFuture = widget.machineRepository.getByCenter(widget.centerId);
   }
 
-  /// Abre un diálogo para añadir una nueva máquina.
+  bool _isValidLabel(String raw) {
+    final trimmed = raw.trim();
+    return trimmed.length >= 2;
+  }
+
   Future<void> _addMachine() async {
     final controller = TextEditingController();
 
@@ -66,28 +65,37 @@ class _MachinesManagerPageState extends State<MachinesManagerPage> {
             child: const Text('Cancelar'),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            onPressed: () => Navigator.pop(context, controller.text),
             child: const Text('Añadir'),
           ),
         ],
       ),
     );
 
-    if (result == null || result.isEmpty) return;
+    if (result == null) return;
+
+    final trimmed = result.trim();
+    if (!_isValidLabel(trimmed)) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pon un nombre válido (mín. 2 caracteres).')),
+      );
+      return;
+    }
 
     try {
       await widget.machineRepository.create(
         centerId: widget.centerId,
-        label: result,
+        label: trimmed,
       );
 
       if (!mounted) return;
       setState(() => _loadMachines());
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Máquina "$result" añadida')),
+        SnackBar(content: Text('Máquina "$trimmed" añadida')),
       );
-    } catch (e) {
+    } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error al añadir la máquina')),
@@ -95,7 +103,6 @@ class _MachinesManagerPageState extends State<MachinesManagerPage> {
     }
   }
 
-  /// Abre un diálogo para editar el nombre de una máquina.
   Future<void> _editMachine(Machine machine) async {
     final controller = TextEditingController(text: machine.label);
 
@@ -117,19 +124,30 @@ class _MachinesManagerPageState extends State<MachinesManagerPage> {
             child: const Text('Cancelar'),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            onPressed: () => Navigator.pop(context, controller.text),
             child: const Text('Guardar'),
           ),
         ],
       ),
     );
 
-    if (result == null || result.isEmpty || result == machine.label) return;
+    if (result == null) return;
+
+    final trimmed = result.trim();
+    if (trimmed == machine.label) return;
+
+    if (!_isValidLabel(trimmed)) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pon un nombre válido (mín. 2 caracteres).')),
+      );
+      return;
+    }
 
     try {
       await widget.machineRepository.update(
         machineId: machine.id,
-        label: result,
+        label: trimmed,
       );
 
       if (!mounted) return;
@@ -138,7 +156,7 @@ class _MachinesManagerPageState extends State<MachinesManagerPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Máquina actualizada')),
       );
-    } catch (e) {
+    } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error al editar la máquina')),
@@ -146,7 +164,6 @@ class _MachinesManagerPageState extends State<MachinesManagerPage> {
     }
   }
 
-  /// Confirma y elimina una máquina.
   Future<void> _deleteMachine(Machine machine) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -154,7 +171,7 @@ class _MachinesManagerPageState extends State<MachinesManagerPage> {
         title: const Text('Eliminar máquina'),
         content: Text(
           '¿Estás seguro de eliminar "${machine.label}"?\n\n'
-              'Las tareas asociadas seguirán existiendo.',
+              'Se eliminarán también las tareas asociadas.',
         ),
         actions: [
           TextButton(
@@ -174,8 +191,13 @@ class _MachinesManagerPageState extends State<MachinesManagerPage> {
 
     if (confirmed != true) return;
 
+    final useCase = DeleteMachineAndTasks(
+      machineRepository: widget.machineRepository,
+      taskRepository: widget.taskRepository,
+    );
+
     try {
-      await widget.machineRepository.delete(machine.id);
+      await useCase(machine.id);
 
       if (!mounted) return;
       setState(() => _loadMachines());
@@ -183,7 +205,7 @@ class _MachinesManagerPageState extends State<MachinesManagerPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Máquina "${machine.label}" eliminada')),
       );
-    } catch (e) {
+    } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error al eliminar la máquina')),
@@ -215,7 +237,6 @@ class _MachinesManagerPageState extends State<MachinesManagerPage> {
             return const Center(child: Text('Error cargando máquinas'));
           }
 
-          // ✅ ORDEN ALFABÉTICO
           final machines = (snapshot.data ?? []).toList()
             ..sort((a, b) =>
                 a.label.toLowerCase().compareTo(b.label.toLowerCase()));

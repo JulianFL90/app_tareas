@@ -80,6 +80,7 @@ class _TaskListPageState extends State<TaskListPage> {
       MaterialPageRoute(
         builder: (_) => MachinesManagerPage(
           machineRepository: widget.machineRepository,
+          taskRepository: widget.taskRepository, // ✅ necesario para borrado en cascada
           centerId: widget.centerId,
           centerName: widget.centerName,
         ),
@@ -87,6 +88,7 @@ class _TaskListPageState extends State<TaskListPage> {
     );
 
     // Al volver, recargamos las máquinas por si hubo cambios.
+    // Y también refrescamos la lista de tareas (pueden haberse borrado por cascada).
     setState(() => _loadMachines());
   }
 
@@ -142,7 +144,7 @@ class _TaskListPageState extends State<TaskListPage> {
             actions: [
               // Botón para gestionar máquinas.
               IconButton(
-                icon: const Icon(Icons.settings_rounded),
+                icon: const Icon(Icons.precision_manufacturing_rounded),
                 tooltip: 'Gestionar máquinas',
                 onPressed: _openMachinesManager,
               ),

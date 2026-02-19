@@ -9,13 +9,12 @@
 //   gracias al contrato TaskRepository.
 
 import 'dart:math';
-import '../domain/task_repository.dart';
+
 import '../domain/task.dart';
-import '../domain/shift.dart';
+import '../domain/task_repository.dart';
 
 class InMemoryTaskRepository implements TaskRepository {
   final List<Task> _tasks = [];
-
   final Random _rng = Random();
 
   @override
@@ -56,6 +55,11 @@ class InMemoryTaskRepository implements TaskRepository {
   @override
   Future<void> delete(String taskId) async {
     _tasks.removeWhere((t) => t.id == taskId);
+  }
+
+  @override
+  Future<void> deleteByMachine(String machineId) async {
+    _tasks.removeWhere((t) => t.machine.id == machineId);
   }
 
   String _newId() {
