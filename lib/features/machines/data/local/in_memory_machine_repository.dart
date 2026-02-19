@@ -53,4 +53,6 @@ class InMemoryMachineRepository implements MachineRepository {
   Future<void> delete(String machineId) async {
     _storage.removeWhere((m) => m.id == machineId);
   }
+
+  
 }

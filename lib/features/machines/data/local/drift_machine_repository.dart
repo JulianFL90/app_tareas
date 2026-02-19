@@ -48,6 +48,28 @@ class DriftMachineRepository implements MachineRepository {
   }
 
   @override
+  Future<Machine> update({
+    required String machineId,
+    required String label,
+  }) async {
+    // Actualizamos solo el label, manteniendo id, centerId y createdAt.
+    await (db.update(db.machinesTable)
+      ..where((m) => m.id.equals(machineId)))
+        .write(
+      MachinesTableCompanion(
+        label: Value(label),
+      ),
+    );
+
+    // Recuperamos la máquina actualizada para devolverla.
+    final row = await (db.select(db.machinesTable)
+      ..where((m) => m.id.equals(machineId)))
+        .getSingle();
+
+    return _mapRowToDomain(row);
+  }
+
+  @override
   Future<void> delete(String machineId) async {
     await (db.delete(db.machinesTable)
       ..where((m) => m.id.equals(machineId)))

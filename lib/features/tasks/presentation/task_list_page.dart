@@ -8,6 +8,7 @@
 // - Mantener el filtro activo mientras la pantalla vive.
 // - Mostrar el nombre del centro activo en el AppBar.
 // - Permitir volver al selector de centros.
+// - Permitir gestionar las máquinas del centro.
 // - Permitir crear nuevas tareas y ver su detalle.
 // - Abrir un bottom sheet para filtrar/ordenar.
 
@@ -20,6 +21,7 @@ import '../domain/task_list_filters.dart';
 import '../domain/tasks_filter.dart';
 import '../../machines/domain/machine.dart';
 import '../../machines/domain/machine_repository.dart';
+import '../../machines/presentation/machines_manager_page.dart';
 import 'tasks_filter_sheet.dart';
 import 'widgets/task_tile.dart';
 import 'task_detail_page.dart';
@@ -69,6 +71,23 @@ class _TaskListPageState extends State<TaskListPage> {
     _machinesFuture = widget.machineRepository
         .getByCenter(widget.centerId)
         .then((machines) => [null, ...machines]);
+  }
+
+  /// Abre la pantalla de gestión de máquinas.
+  Future<void> _openMachinesManager() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MachinesManagerPage(
+          machineRepository: widget.machineRepository,
+          centerId: widget.centerId,
+          centerName: widget.centerName,
+        ),
+      ),
+    );
+
+    // Al volver, recargamos las máquinas por si hubo cambios.
+    setState(() => _loadMachines());
   }
 
   @override
@@ -121,6 +140,13 @@ class _TaskListPageState extends State<TaskListPage> {
             title: Text(widget.centerName),
 
             actions: [
+              // Botón para gestionar máquinas.
+              IconButton(
+                icon: const Icon(Icons.settings_rounded),
+                tooltip: 'Gestionar máquinas',
+                onPressed: _openMachinesManager,
+              ),
+
               // Botón de filtros.
               IconButton(
                 tooltip: 'Filtrar y ordenar',

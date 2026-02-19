@@ -16,6 +16,12 @@ abstract interface class MachineRepository {
     required String label,
   });
 
+  /// Actualiza el label de una máquina existente.
+  Future<Machine> update({
+    required String machineId,
+    required String label,
+  });
+
   /// Elimina una máquina por su id.
   Future<void> delete(String machineId);
 }
