@@ -126,12 +126,9 @@ class _MachinesManagerPageState extends State<MachinesManagerPage> {
 
     if (result == null || result.isEmpty || result == machine.label) return;
 
-    // TODO: implementar método edit en MachineRepository
-    // Por ahora eliminamos y creamos de nuevo (no ideal pero funciona)
     try {
-      await widget.machineRepository.delete(machine.id);
-      await widget.machineRepository.create(
-        centerId: widget.centerId,
+      await widget.machineRepository.update(
+        machineId: machine.id,
         label: result,
       );
 
@@ -218,7 +215,10 @@ class _MachinesManagerPageState extends State<MachinesManagerPage> {
             return const Center(child: Text('Error cargando máquinas'));
           }
 
-          final machines = snapshot.data ?? [];
+          // ✅ ORDEN ALFABÉTICO
+          final machines = (snapshot.data ?? []).toList()
+            ..sort((a, b) =>
+                a.label.toLowerCase().compareTo(b.label.toLowerCase()));
 
           if (machines.isEmpty) {
             return Center(

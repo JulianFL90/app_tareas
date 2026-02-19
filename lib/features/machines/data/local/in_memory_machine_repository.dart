@@ -54,5 +54,21 @@ class InMemoryMachineRepository implements MachineRepository {
     _storage.removeWhere((m) => m.id == machineId);
   }
 
-  
+  @override
+  Future<Machine> update({
+    required String machineId,
+    required String label,
+  }) async {
+    final index = _storage.indexWhere((m) => m.id == machineId);
+
+    if (index == -1) {
+      throw StateError('Machine not found: $machineId');
+    }
+
+    final updated = _storage[index].copyWith(label: label);
+    _storage[index] = updated;
+
+    return updated;
+  }
+
 }

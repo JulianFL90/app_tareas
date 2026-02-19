@@ -16,6 +16,19 @@ class Machine {
     required this.label,
   });
 
+  Machine copyWith({
+    String? id,
+    String? centerId,
+    String? label,
+  }) {
+    return Machine(
+      id: id ?? this.id,
+      centerId: centerId ?? this.centerId,
+      label: label ?? this.label,
+    );
+  }
+
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) || (other is Machine && other.id == id);
