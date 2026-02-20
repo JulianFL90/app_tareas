@@ -18,6 +18,7 @@ import '../core/theme/app_theme.dart';
 // Infraestructura (persistencia).
 import '../core/data/local/app_database.dart';
 import '../features/tasks/data/local/drift_task_repository.dart';
+import '../features/tasks/data/local/drift_task_update_repository.dart'; // ✅ NUEVO
 import '../features/centers/data/local/drift_center_repository.dart';
 import '../features/machines/data/local/drift_machine_repository.dart';
 
@@ -30,15 +31,6 @@ import 'app_gate.dart';
 class App extends StatelessWidget {
   const App({super.key});
 
-  /// Método build: construye la UI del widget.
-  ///
-  /// En Flutter, cada widget tiene un método build que describe
-  /// cómo debe verse usando otros widgets.
-  ///
-  /// Aquí construimos:
-  /// 1. La base de datos SQLite (Drift).
-  /// 2. Los repositorios que acceden a ella.
-  /// 3. El MaterialApp que envuelve toda la aplicación.
   @override
   Widget build(BuildContext context) {
     // ─────────────────────────────────────
@@ -57,6 +49,7 @@ class App extends StatelessWidget {
     // Todos comparten la misma instancia de AppDatabase.
     // Cada repositorio encapsula el acceso a una tabla específica.
     final taskRepository = DriftTaskRepository(db: database);
+    final taskUpdateRepository = DriftTaskUpdateRepository(db: database); // ✅ NUEVO
     final centerRepository = DriftCenterRepository(db: database);
     final machineRepository = DriftMachineRepository(db: database);
 
@@ -64,22 +57,14 @@ class App extends StatelessWidget {
     // MaterialApp: Estructura de la app
     // ─────────────────────────────────────
 
-    /// MaterialApp es el widget raíz de toda app Flutter con Material Design.
-    /// Define configuración global: tema, navegación, localización, etc.
     return MaterialApp(
-      // Oculta el banner de "Debug" en la esquina superior derecha.
       debugShowCheckedModeBanner: false,
-
-      // Tema visual de la app (colores, tipografía, estilos de widgets).
       theme: AppTheme.light(),
-
-      // Pantalla inicial de la app.
-      // AppGate decide qué mostrar según el estado inicial
-      // (si ya existe un centro o no).
       home: AppGate(
         centerRepository: centerRepository,
         taskRepository: taskRepository,
         machineRepository: machineRepository,
+        taskUpdateRepository: taskUpdateRepository, // ✅ NUEVO
       ),
     );
   }

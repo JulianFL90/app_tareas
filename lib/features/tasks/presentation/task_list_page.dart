@@ -1,16 +1,6 @@
 // lib/features/tasks/presentation/task_list_page.dart
 //
 // 📋 Pantalla principal: lista de tareas pendientes.
-//
-// Responsabilidad:
-// - Cargar las máquinas del centro activo desde MachineRepository.
-// - Cargar tareas desde TaskRepository.
-// - Mantener el filtro activo mientras la pantalla vive.
-// - Mostrar el nombre del centro activo en el AppBar.
-// - Permitir volver al selector de centros.
-// - Permitir gestionar las máquinas del centro.
-// - Permitir crear nuevas tareas y ver su detalle.
-// - Abrir un bottom sheet para filtrar/ordenar.
 
 import 'package:flutter/material.dart';
 
@@ -19,6 +9,7 @@ import '../domain/task_repository.dart';
 import '../domain/task.dart';
 import '../domain/task_list_filters.dart';
 import '../domain/tasks_filter.dart';
+import '../domain/task_update_repository.dart';
 import '../../machines/domain/machine.dart';
 import '../../machines/domain/machine_repository.dart';
 import '../../machines/presentation/machines_manager_page.dart';
@@ -29,20 +20,18 @@ import 'task_detail_page.dart';
 class TaskListPage extends StatefulWidget {
   final TaskRepository taskRepository;
   final MachineRepository machineRepository;
+  final TaskUpdateRepository taskUpdateRepository;
 
-  /// Id del centro activo. Determina qué máquinas se cargan.
   final String centerId;
-
-  /// Nombre del centro activo. Se muestra en el AppBar.
   final String centerName;
 
-  /// Callback para volver al selector de centros.
   final VoidCallback onBackToSelector;
 
   const TaskListPage({
     super.key,
     required this.taskRepository,
     required this.machineRepository,
+    required this.taskUpdateRepository,
     required this.centerId,
     required this.centerName,
     required this.onBackToSelector,
@@ -53,11 +42,8 @@ class TaskListPage extends StatefulWidget {
 }
 
 class _TaskListPageState extends State<TaskListPage> {
-  /// Filtro activo. Persiste mientras la pantalla vive.
   TasksFilter _filter = TasksFilter.initial;
 
-  /// Máquinas del centro activo cargadas desde Drift.
-  /// Incluye null como primera opción ("Todas") para la UI del filtro.
   late Future<List<Machine?>> _machinesFuture;
 
   @override
@@ -66,29 +52,25 @@ class _TaskListPageState extends State<TaskListPage> {
     _loadMachines();
   }
 
-  /// Carga las máquinas del centro activo y añade null al inicio ("Todas").
   void _loadMachines() {
     _machinesFuture = widget.machineRepository
         .getByCenter(widget.centerId)
         .then((machines) => [null, ...machines]);
   }
 
-  /// Abre la pantalla de gestión de máquinas.
   Future<void> _openMachinesManager() async {
     await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => MachinesManagerPage(
           machineRepository: widget.machineRepository,
-          taskRepository: widget.taskRepository, // ✅ necesario para borrado en cascada
+          taskRepository: widget.taskRepository,
           centerId: widget.centerId,
           centerName: widget.centerName,
         ),
       ),
     );
 
-    // Al volver, recargamos las máquinas por si hubo cambios.
-    // Y también refrescamos la lista de tareas (pueden haberse borrado por cascada).
     setState(() => _loadMachines());
   }
 
@@ -129,27 +111,19 @@ class _TaskListPageState extends State<TaskListPage> {
             },
             child: const Icon(Icons.add),
           ),
-
           appBar: AppBar(
-            // Botón para volver al selector de centros.
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_rounded),
               tooltip: 'Cambiar de centro',
               onPressed: widget.onBackToSelector,
             ),
-
-            // Mostramos el nombre del centro activo como título.
             title: Text(widget.centerName),
-
             actions: [
-              // Botón para gestionar máquinas.
               IconButton(
                 icon: const Icon(Icons.precision_manufacturing_rounded),
                 tooltip: 'Gestionar máquinas',
                 onPressed: _openMachinesManager,
               ),
-
-              // Botón de filtros.
               IconButton(
                 tooltip: 'Filtrar y ordenar',
                 icon: Icon(
@@ -170,7 +144,6 @@ class _TaskListPageState extends State<TaskListPage> {
               ),
             ],
           ),
-
           body: FutureBuilder<List<Task>>(
             future: widget.taskRepository.getAll(),
             builder: (context, snapshot) {
@@ -222,6 +195,7 @@ class _TaskListPageState extends State<TaskListPage> {
 
                   return TaskTile(
                     task: task,
+                    taskUpdateRepository: widget.taskUpdateRepository, // ✅
                     onTap: () async {
                       await Navigator.push(
                         context,
@@ -229,6 +203,8 @@ class _TaskListPageState extends State<TaskListPage> {
                           builder: (_) => TaskDetailPage(
                             task: task,
                             taskRepository: widget.taskRepository,
+                            taskUpdateRepository:
+                            widget.taskUpdateRepository, // ✅
                           ),
                         ),
                       );
@@ -246,8 +222,6 @@ class _TaskListPageState extends State<TaskListPage> {
   }
 }
 
-/// Abre el BottomSheet de filtros y devuelve el filtro elegido.
-/// Devuelve null si el usuario cancela.
 Future<TasksFilter?> _openFilterSheet({
   required BuildContext context,
   required TasksFilter current,

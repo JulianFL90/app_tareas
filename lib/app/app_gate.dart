@@ -1,13 +1,4 @@
 // lib/app/app_gate.dart
-//
-// 🚪 Puerta de entrada de la app.
-//
-// Decide qué mostrar según el estado inicial:
-// - Sin centros → wizard de creación (CreateCenterPage).
-// - Con centros → selector de centro (CenterPickerPage).
-//
-// Una vez el usuario selecciona un centro, entra en AppShell
-// con el centerId activo.
 
 import 'package:flutter/material.dart';
 
@@ -17,18 +8,21 @@ import '../features/centers/presentation/center_picker_page.dart';
 import '../features/centers/presentation/create_center_page.dart';
 import '../features/machines/domain/machine_repository.dart';
 import '../features/tasks/domain/task_repository.dart';
+import '../features/tasks/domain/task_update_repository.dart';
 import 'app_shell.dart';
 
 class AppGate extends StatefulWidget {
   final CenterRepository centerRepository;
   final TaskRepository taskRepository;
   final MachineRepository machineRepository;
+  final TaskUpdateRepository taskUpdateRepository; // ✅ NUEVO
 
   const AppGate({
     super.key,
     required this.centerRepository,
     required this.taskRepository,
     required this.machineRepository,
+    required this.taskUpdateRepository, // ✅ NUEVO
   });
 
   @override
@@ -60,6 +54,7 @@ class _AppGateState extends State<AppGate> {
       return AppShell(
         taskRepository: widget.taskRepository,
         machineRepository: widget.machineRepository,
+        taskUpdateRepository: widget.taskUpdateRepository, // ✅
         activeCenterId: _activeCenter!.id,
         activeCenterName: _activeCenter!.name,
         onBackToSelector: _backToSelector,
@@ -95,7 +90,7 @@ class _AppGateState extends State<AppGate> {
           centers: centers,
           centerRepository: widget.centerRepository,
           machineRepository: widget.machineRepository,
-          taskRepository: widget.taskRepository, // ✅ añadido
+          taskRepository: widget.taskRepository,
           isPremium: false,
           onCenterSelected: (center) {
             setState(() => _activeCenter = center);

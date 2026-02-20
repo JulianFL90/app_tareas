@@ -1,25 +1,18 @@
-// lib/features/tasks/presentation/widgets/task_tile.dart
-//
-// 🎨 Widget visual para mostrar una tarea en una lista.
-//
-// Por qué existe este archivo:
-// - Centraliza el diseño de una tarea.
-// - Evita meter UI compleja en la page.
-// - Permite indicar prioridad de un vistazo (color del borde izquierdo).
-
 import 'package:flutter/material.dart';
 
 import '../../domain/task.dart';
-import '../../domain/task_priority.dart';
-import '../../domain/shift.dart';
+import '../../domain/task_update_repository.dart';
+import 'task_info_chips.dart';
 
 class TaskTile extends StatelessWidget {
   final Task task;
+  final TaskUpdateRepository taskUpdateRepository;
   final VoidCallback? onTap;
 
   const TaskTile({
     super.key,
     required this.task,
+    required this.taskUpdateRepository,
     this.onTap,
   });
 
@@ -55,7 +48,6 @@ class TaskTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Descripción (lo más importante)
               Text(
                 task.description,
                 maxLines: 2,
@@ -67,108 +59,27 @@ class TaskTile extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // Información secundaria con iconos
-              Row(
-                children: [
-                  // Máquina
-                  _InfoChip(
-                    icon: Icons.precision_manufacturing_rounded,
-                    label: task.machine.label,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(width: 8),
+              TaskInfoChips(task: task),
 
-                  // Prioridad
-                  _InfoChip(
-                    icon: _priorityIcon(task.priority),
-                    label: task.priority.label,
-                    color: borderColor,
-                  ),
-                  const SizedBox(width: 8),
+              const SizedBox(height: 10),
 
-                  // Turno
-                  _InfoChip(
-                    icon: _shiftIcon(task.shift),
-                    label: task.shift.label,
-                    color: theme.colorScheme.secondary,
-                  ),
-                ],
+              FutureBuilder<int>(
+                future: taskUpdateRepository.countByTask(task.id),
+                builder: (context, snap) {
+                  final count = snap.data ?? 0;
+                  if (count <= 0) return const SizedBox.shrink();
+
+                  return Text(
+                    'Actualizaciones: $count',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  );
+                },
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  /// Icono según la prioridad.
-  IconData _priorityIcon(TaskPriority priority) {
-    switch (priority) {
-      case TaskPriority.low:
-        return Icons.arrow_downward_rounded;
-      case TaskPriority.medium:
-        return Icons.drag_handle_rounded;
-      case TaskPriority.high:
-        return Icons.arrow_upward_rounded;
-    }
-  }
-
-  /// Icono según el turno.
-  IconData _shiftIcon(Shift shift) {
-    switch (shift) {
-      case Shift.morning:
-        return Icons.wb_sunny_rounded;
-      case Shift.afternoon:
-        return Icons.wb_twilight_rounded;
-      case Shift.night:
-        return Icons.nightlight_round;
-    }
-  }
-}
-
-/// Chip informativo con icono y texto.
-class _InfoChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-
-  const _InfoChip({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 16,
-            color: color,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: color,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
       ),
     );
   }
