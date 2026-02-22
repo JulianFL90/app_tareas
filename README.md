@@ -1,118 +1,166 @@
+📱 Technical Task Management App
 
-📱 Task Management App – Technical Center
+A Flutter-based mobile application designed to manage industrial maintenance tasks inside technical centers.
 
-A mobile application built with Flutter to manage technical tasks inside an industrial maintenance center.
+This project replaces informal communication (WhatsApp / verbal instructions) with a structured, traceable and scalable system.
 
-The goal of this project is to replace informal communication methods (WhatsApp / verbal communication) with a structured, traceable and scalable task management system.
+🚩 The Problem
 
-🚩 Problem It Solves
-
-In technical and industrial environments:
+In industrial maintenance environments:
 
 Tasks are communicated verbally
 
-There is no historical record
-
-It is unclear who created the task
+No historical trace exists
 
 Incidents are lost between shifts
 
-No structured priority control exists
+Priority handling is inconsistent
 
-This application allows:
+No structured tracking system
 
-Creating tasks linked to a specific machine
+This leads to operational inefficiencies and lack of accountability.
 
-Setting task priority
+💡 The Solution
 
-Registering the technician who created the task
+This application provides:
 
-Maintaining task history
+Task creation linked to specific machines
 
-Preparing the system for multi-center scalability
+Priority-based task classification
 
-🧱 Tech Stack
+Task history with update tracking
+
+Step counter per task (progress visibility)
+
+Scalable architecture ready for multi-center support
+
+# 📸 Screenshots
+
+### 🏠 Task List
+![Task List](assets/screenshots/task_list.png)
+
+### 📝 Task Detail
+![Task Detail](assets/screenshots/task_detail.png)
+
+🧱 Architecture
+
+This project follows a feature-based, domain-oriented structure.
+
+lib/
+├── app/
+├── core/
+├── features/
+│    ├── centers/
+│    ├── machines/
+│    └── tasks/
+│         ├── domain/
+│         ├── data/
+│         └── presentation/
+└── main.dart
+Architectural Principles
+
+Clear separation of concerns
+
+Domain-driven structure
+
+Repository pattern
+
+Dependency injection at composition root
+
+Scalable toward backend integration
+
+⚙️ Current MVP Features
+
+Task creation
+
+Machine selection
+
+Priority management
+
+Task updates with history
+
+Update counter per task
+
+Local state management
+
+Clean feature-based structure
+
+🔜 In Progress
+
+Local persistence using Drift
+
+Multi-center support
+
+Task status workflow (Pending / In Progress / Completed)
+
+Filtering & sorting
+
+Export functionality
+
+🚀 Planned Scalability
+Phase 1 – Local Robust MVP
+
+Drift local database
+
+Advanced filtering
+
+Task statistics
+
+Phase 2 – Multi-Center Architecture
+
+Center management
+
+Technician management
+
+Role system
+
+Phase 3 – Enterprise Expansion
+
+Backend API (NestJS)
+
+Cross-center synchronization
+
+Spare parts request system
+
+Technical documentation chatbot
+
+Predictive maintenance integration
+
+🛠 Tech Stack
 
 Flutter (Dart)
 
 Feature-based architecture
 
-Domain-oriented structure
+Repository pattern
 
-Designed for future integration with:
+Drift (planned local persistence)
 
-Drift (local database)
+Future-ready backend (NestJS / REST)
 
-Backend API (NestJS / REST)
-
-📂 Project Structure
-lib/
-├── app/
-├── features/
-│    └── tasks/
-│         ├── domain/
-│         ├── presentation/
-│         └── data/ (planned)
-└── main.dart
-
-
-Clear separation between:
-
-UI (presentation layer)
-
-Domain models
-
-Future data layer
-
-⚙️ Current Status (MVP)
-
-✔ Task creation
-✔ Machine selection
-✔ Priority selection
-✔ Scalable project structure
-🔜 Local persistence with Drift
-🔜 Image attachment support
-🔜 Multi-center support
-
-🏗 Roadmap
-Phase 1 – Local MVP
-
-Local persistence using Drift
-
-Task listing screen
-
-Filtering by machine and priority
-
-Phase 2 – Scalability
-
-Multi-center support
-
-Technician management
-
-Simple authentication system
-
-Phase 3 – Enterprise Expansion
-
-Centralized backend
-
-Cross-center synchronization
-
-Spare parts request system between centers
-
-Technical chatbot with shared documentation
-
-▶️ How to Run
+▶️ Run Locally
 flutter pub get
 flutter run
-
 🎯 Long-Term Vision
 
-Transform this project into a scalable industrial task management solution that enables:
+To evolve into a scalable industrial task management platform that enables:
 
 Standardized incident tracking
 
-Full traceability
+Full operational traceability
 
-Structured communication between centers
+Structured inter-center communication
 
-Future integration with predictive maintenance systems
+Future predictive maintenance integration
+
+🧠 Why This Project Matters
+
+This project demonstrates:
+
+Clean architecture thinking
+
+Domain evolution planning
+
+Scalability-first mindset
+
+Real-world industrial problem solving

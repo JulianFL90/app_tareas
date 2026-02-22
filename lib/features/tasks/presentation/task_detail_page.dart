@@ -25,6 +25,14 @@ class TaskDetailPage extends StatefulWidget {
 class _TaskDetailPageState extends State<TaskDetailPage> {
   late Future<List<TaskUpdate>> _updatesFuture;
 
+  /// Indica si se está guardando una actualización.
+  ///
+  /// Se usa para:
+  /// - Evitar doble submit (usuario pulsando "Guardar" varias veces).
+  /// - Desactivar botones mientras se guarda (UX + consistencia).
+  /// - Mostrar feedback visual de "guardando".
+  bool _isSavingUpdate = false;
+
   @override
   void initState() {
     super.initState();
@@ -36,52 +44,103 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   }
 
   Future<void> _addUpdate() async {
+    if (_isSavingUpdate) return;
+
     final controller = TextEditingController();
 
     final text = await showDialog<String>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Añadir actualización'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          minLines: 2,
-          maxLines: 5,
-          decoration: const InputDecoration(
-            hintText: 'Ej: Se ha tensado la banda y se deja en observación.',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('Guardar'),
-          ),
-        ],
-      ),
+      barrierDismissible: false,
+      builder: (_) {
+        String? errorText;
+
+        return StatefulBuilder(
+          builder: (context, setLocalState) {
+            void validate() {
+              final trimmed = controller.text.trim();
+              if (trimmed.isEmpty) {
+                errorText = 'Escribe una actualización.';
+              } else if (trimmed.length < 2) {
+                errorText = 'Demasiado corta.';
+              } else if (trimmed.length > 300) {
+                errorText = 'Máximo 300 caracteres.';
+              } else {
+                errorText = null;
+              }
+            }
+
+            final canSubmit = !_isSavingUpdate;
+
+            return AlertDialog(
+              title: const Text('Añadir actualización'),
+              content: TextField(
+                controller: controller,
+                autofocus: true,
+                minLines: 2,
+                maxLines: 5,
+                maxLength: 300,
+                onChanged: (_) => setLocalState(validate),
+                decoration: InputDecoration(
+                  hintText: 'Ej: Se ha tensado la banda y se deja en observación.',
+                  errorText: errorText,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: _isSavingUpdate ? null : () => Navigator.pop(context),
+                  child: const Text('Cancelar'),
+                ),
+                FilledButton(
+                  onPressed: !canSubmit
+                      ? null
+                      : () {
+                    validate();
+                    setLocalState(() {});
+                    if (errorText != null) return;
+                    Navigator.pop(context, controller.text);
+                  },
+                  child: _isSavingUpdate
+                      ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                      : const Text('Guardar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
 
     if (text == null) return;
+
     final trimmed = text.trim();
-    if (trimmed.length < 2) return;
 
     try {
+      setState(() => _isSavingUpdate = true);
+
       await widget.taskUpdateRepository.create(
         taskId: widget.task.id,
         message: trimmed,
       );
 
       if (!mounted) return;
-      setState(_loadUpdates);
+
+      setState(() {
+        _isSavingUpdate = false;
+        _loadUpdates();
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Actualización añadida')),
       );
     } catch (_) {
       if (!mounted) return;
+
+      setState(() => _isSavingUpdate = false);
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No se pudo añadir la actualización')),
       );
@@ -99,7 +158,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           IconButton(
             tooltip: 'Añadir actualización',
             icon: const Icon(Icons.add_comment_rounded),
-            onPressed: _addUpdate,
+            onPressed: _isSavingUpdate ? null : _addUpdate,
           ),
         ],
       ),
@@ -161,7 +220,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               ),
               const Spacer(),
               TextButton.icon(
-                onPressed: _addUpdate,
+                onPressed: _isSavingUpdate ? null : _addUpdate,
                 icon: const Icon(Icons.add_rounded, size: 18),
                 label: const Text('Añadir'),
               ),
