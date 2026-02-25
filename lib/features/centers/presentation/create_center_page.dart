@@ -110,9 +110,9 @@ class _CreateCenterPageState extends State<CreateCenterPage> {
                             const WizardStepHeaderCard(
                               icon: Icons.apartment_rounded,
                               stepLabel: 'Paso 1/2',
-                              title: 'Crea tu centro',
+                              title: 'Crea tu espacio de trabajo',
                               subtitle:
-                              'Un centro es tu "espacio de trabajo". Dentro añadirás máquinas, lugares de trabajo y tareas.',
+                              'Dentro añadirás máquinas, lugares de trabajo y tareas.',
                             ),
                             const SizedBox(height: 12),
                             CreateCenterFormCard(

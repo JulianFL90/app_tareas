@@ -31,7 +31,7 @@ class CreateCenterFormCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Nombre del centro',
+              'Nombre del espacio de trabajo',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
@@ -43,7 +43,7 @@ class CreateCenterFormCard extends StatelessWidget {
               textInputAction: TextInputAction.done,
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.location_city_rounded),
-                hintText: 'Ej: ZAL BCN',
+                hintText: 'Ej: Almacén central',
                 errorText: errorText,
                 helperText: errorText == null
                     ? 'Usa un nombre corto y reconocible (mín. 3 caracteres).'
