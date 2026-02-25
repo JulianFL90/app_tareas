@@ -6,7 +6,7 @@ publish_to: 'none' # Evita publicar accidentalmente en pub.dev
 # Formato: version+build
 # En Android: versionName + versionCode
 # En iOS: CFBundleShortVersionString + CFBundleVersion
-version: 1.0.0+1
+
 
 environment:
   # Versión mínima de Dart compatible
