@@ -1,4 +1,4 @@
-package com.example.app_tareas
+package com.jflapps.mtasks
 
 import io.flutter.embedding.android.FlutterActivity
 

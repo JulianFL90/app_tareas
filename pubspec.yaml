@@ -43,8 +43,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-
-
   # Reglas de buenas prácticas recomendadas por Flutter
   flutter_lints: ^5.0.0
 
@@ -54,11 +52,19 @@ dev_dependencies:
   # Ejecuta generadores como Drift (build runner)
   build_runner: ^2.4.0
 
+  # Generador de iconos de launcher (Android/iOS)
+  flutter_launcher_icons: ^0.13.1
+
+# Configuración del generador de iconos
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/icon.png"
+
 # ----------------------------
 # CONFIGURACIÓN FLUTTER
 # ----------------------------
 flutter:
-
   # Habilita iconos Material
   uses-material-design: true
 
